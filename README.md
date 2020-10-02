@@ -119,9 +119,9 @@ I deployed as soon as the structure was built to make it easier to debug the dep
   ```bash
   git add .
   git commit -m "<message>"
-  git push origin master
+  git push origin main
   heroku create <app name>
-  git push heroku master
+  git push heroku main
   heroku ps:scale web=1
   ```
 

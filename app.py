@@ -3,6 +3,7 @@ import dash_bootstrap_components as dbc
 import dash_auth
 import json
 import os
+from neo4j import GraphDatabase
 
 external_stylesheets = [dbc.themes.YETI]  # Also try LITERA, SPACELAB
 
@@ -27,3 +28,20 @@ app.config.suppress_callback_exceptions = True
 #     app,
 #     VALID_USERNAME_PASSWORD_PAIRS
 # )
+
+graphenedb_url = os.environ.get("GRAPHENEDB_BOLT_URL")
+graphenedb_user = os.environ.get("GRAPHENEDB_BOLT_USER")
+graphenedb_pass = os.environ.get("GRAPHENEDB_BOLT_PASSWORD")
+
+driver = GraphDatabase.driver(graphenedb_url, auth=(graphenedb_user, graphenedb_pass), encrypted=True)
+
+session = driver.session()
+
+session.run("MATCH (:Person {name: 'Tom Hanks'})-[:ACTED_IN]->(tomHanksMovies) RETURN movies")
+
+def print_count(tx):
+    for record in tx.run(query):
+        print(record["movies"]["title"])
+
+with driver.session() as session:
+    session.read_transaction(print_count)
