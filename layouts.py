@@ -65,10 +65,6 @@ text = dcc.Markdown(
 # search bar
 
 # options
-# _option_list = ['Amazon', 'USAID', 'Caribbean', 'Brazillian', 'Central America',
-#                'Southern Caribbean', 'Latin America', 'CITES', 'TRAFFIC',
-#                'Google Earth', 'USFS', 'Amazonian', 'IUCN', 'Coca-Cola',
-#                'ICWL']
 _option_list = graph_database.get_options()
 options = [
     {'label': option, 'value': option} for option in _option_list
@@ -98,67 +94,6 @@ CONTENT_STYLE = {
     "margin-right": "2rem",
     "padding": "2rem 1rem",
 }
-
-
-
-
-# def create_dropdown(id, options, placeholder = '', multi=False):
-#     options = [
-#         {'label': option, 'value': option} for option in options
-#     ]
-#     dropdown = dcc.Dropdown(
-#         id=id,
-#         options=options,
-#         placeholder=placeholder,
-#         multi=multi
-#     )
-    
-#     return dropdown
-
-# # region/country
-# country_list = ['Brazil', 'Caribbean', 'Central America']
-# country_filter = dbc.FormGroup(
-#     [
-#         dbc.Label('Region'),
-#         create_dropdown('country_filter', country_list)
-#     ]
-# )
-
-# # income group
-# income_list = ['Upper Middle Income', 'Low Income']
-# income_filter = dbc.FormGroup(
-#     [
-#         dbc.Label('Income Group'),
-#         create_dropdown('income_filter', income_list)
-#     ]
-# )
-
-# # subagency
-# subagency_list = ['Bureau for Latin America and Caribbean']
-# subagency_filter = dbc.FormGroup(
-#     [
-#         dbc.Label('Subagency'),
-#         create_dropdown('subagency_filter', subagency_list)
-#     ]
-# )
-
-# # category
-# category_list = ['NGO', 'Enterprises', 'Universities & Research Institutions']
-# category_filter = dbc.FormGroup(
-#     [
-#         dbc.Label('Category'),
-#         create_dropdown('category_filter', category_list)
-#     ]
-# )
-
-# # sector
-# sector_list = ['General Environmental Protection', 'Energy']
-# sector_filter = dbc.FormGroup(
-#     [
-#         dbc.Label('Sector'),
-#         create_dropdown('sector_filter', sector_list)
-#     ]
-# )
 
 
 # region/country

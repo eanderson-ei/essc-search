@@ -34,6 +34,7 @@ def add_tag_to_search(*button_clicks):
         option = ctx.triggered[0]['prop_id'].split('.')[0]
         return [option]
 
+
 # Store results
 @app.callback(
     Output('results_store', 'children'),
@@ -47,35 +48,7 @@ def query_reports(tags):
         return {}
 
 
-# # def generate_filter_callback(filter_id, results):
-# def generate_filter_callbacks():
-#     def filter_reports(filter_id, results):
-#         if not results:
-#             raise PreventUpdate
-#         else:
-#             filter_dict = {
-#                 'country_filter': 'Country',
-#                 'income_filter': 'Income Group',
-#                 'category_filter': 'Category',
-#                 'sector_filter': 'Sector' 
-#             }
-            
-#             df = pd.DataFrame(results)
-#             options = df[filter_dict.get(filter_id)].unique()
-#             options = [
-#                 {'label': option, 'value': option} for option in options
-#             ]
-#             return options
-           
-# # Update filters
-# filters = ['country_filter', 'income_filter', 'category_filter', 'sector_filter']
-# for filter_id in filters:
-#     app.callback(
-#         Output(filter_id, 'options'),
-#         [Input(filter_id, 'id'),
-#          Input('results_store', 'children')]
-#     )(generate_filter_callbacks())
-
+# Populate filter options
 filter_dict = {
     'country_filter': 'Country',
     'income_filter': 'Income Group',
@@ -83,6 +56,7 @@ filter_dict = {
     'sector_filter': 'Sector'
     }
 
+# country filter
 @app.callback(
     Output('country_filter', 'options'),
     [Input('results_store', 'children')]
@@ -100,6 +74,7 @@ def update_country_filter(results):
         return [{'label': '', 'value': ''}]
 
 
+# income filter
 @app.callback(
     Output('income_filter', 'options'),
     [Input('results_store', 'children')]
@@ -116,7 +91,8 @@ def update_income_filter(results):
     else:
         return [{'label': '', 'value': ''}]
     
-    
+
+# category filter
 @app.callback(
     Output('category_filter', 'options'),
     [Input('results_store', 'children')]
@@ -134,6 +110,7 @@ def update_category_filter(results):
         return [{'label': '', 'value': ''}]
     
 
+# sector filter
 @app.callback(
     Output('sector_filter', 'options'),
     [Input('results_store', 'children')]
@@ -151,21 +128,6 @@ def update_sector_filter(results):
         return [{'label': '', 'value': ''}]
     
     
-    
-# @app.callback(
-#     Output({'type': 'filter', 'index': ALL}, 'options'),
-#     Input('results_store', 'children')]
-# )
-# def update_filter_options(results):
-#     filter_dict = {
-#             'country_filter': 'Country',
-#             'income_filter': 'Income Group',
-#             'category_filter': 'Category',
-#             'sector_filter': 'Sector' 
-#         }
-#     df = pd.DataFrame(results)
-#     options = df[filter_dict.get(filter_id)].unique()
-
 # Search Results
 @app.callback(
     Output('results', 'children'),
@@ -224,27 +186,6 @@ def update_search_results(results,
             ), style = {"margin-top": "2rem"}
         )
         cards.append(report_card)
-        # # get project
-        # project = graph_database.get_project_from_report(result['m.name'])
-        # # build report card
-        # report_card = dbc.Card(
-        #     dbc.CardBody(
-        #         [
-        #             html.H4(result['m.Report_Title'], 
-        #                     className="card-title"),
-        #             html.H6(project.upper(), 
-        #                     className="card-subtitle"),
-        #             html.P(
-        #                 result['m.summary'],
-        #                 className="card-text",
-        #             ),
-        #             html.A("Report link", 
-        #                 href=result['m.Link'],
-        #                 target="_blank"),
-        #         ]
-        #     ), style = {"margin-top": "2rem"}
-        # )
-        # cards.append(report_card)
     
     if len(cards)>0:
         return cards
