@@ -1,6 +1,7 @@
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
+from components import graph_database
 
 # import necessary functions from components/functions.py if needed
 
@@ -64,10 +65,11 @@ text = dcc.Markdown(
 # search bar
 
 # options
-_option_list = ['Amazon', 'USAID', 'Caribbean', 'Brazillian', 'Central America',
-               'Southern Caribbean', 'Latin America', 'CITES', 'TRAFFIC',
-               'Google Earth', 'USFS', 'Amazonian', 'IUCN', 'Coca-Cola',
-               'ICWL']
+# _option_list = ['Amazon', 'USAID', 'Caribbean', 'Brazillian', 'Central America',
+#                'Southern Caribbean', 'Latin America', 'CITES', 'TRAFFIC',
+#                'Google Earth', 'USFS', 'Amazonian', 'IUCN', 'Coca-Cola',
+#                'ICWL']
+_option_list = graph_database.get_options()
 options = [
     {'label': option, 'value': option} for option in _option_list
 ]
@@ -97,63 +99,112 @@ CONTENT_STYLE = {
     "padding": "2rem 1rem",
 }
 
-def create_dropdown(id, options, placeholder = '', multi=False):
-    options = [
-        {'label': option, 'value': option} for option in options
-    ]
-    dropdown = dcc.Dropdown(
-        id=id,
-        options=options,
-        placeholder=placeholder,
-        multi=multi
-    )
-    
-    return dropdown
 
-# region
-region_list = ['Brazil', 'Caribbean', 'Central America']
-region_filter = dbc.FormGroup(
+
+
+# def create_dropdown(id, options, placeholder = '', multi=False):
+#     options = [
+#         {'label': option, 'value': option} for option in options
+#     ]
+#     dropdown = dcc.Dropdown(
+#         id=id,
+#         options=options,
+#         placeholder=placeholder,
+#         multi=multi
+#     )
+    
+#     return dropdown
+
+# # region/country
+# country_list = ['Brazil', 'Caribbean', 'Central America']
+# country_filter = dbc.FormGroup(
+#     [
+#         dbc.Label('Region'),
+#         create_dropdown('country_filter', country_list)
+#     ]
+# )
+
+# # income group
+# income_list = ['Upper Middle Income', 'Low Income']
+# income_filter = dbc.FormGroup(
+#     [
+#         dbc.Label('Income Group'),
+#         create_dropdown('income_filter', income_list)
+#     ]
+# )
+
+# # subagency
+# subagency_list = ['Bureau for Latin America and Caribbean']
+# subagency_filter = dbc.FormGroup(
+#     [
+#         dbc.Label('Subagency'),
+#         create_dropdown('subagency_filter', subagency_list)
+#     ]
+# )
+
+# # category
+# category_list = ['NGO', 'Enterprises', 'Universities & Research Institutions']
+# category_filter = dbc.FormGroup(
+#     [
+#         dbc.Label('Category'),
+#         create_dropdown('category_filter', category_list)
+#     ]
+# )
+
+# # sector
+# sector_list = ['General Environmental Protection', 'Energy']
+# sector_filter = dbc.FormGroup(
+#     [
+#         dbc.Label('Sector'),
+#         create_dropdown('sector_filter', sector_list)
+#     ]
+# )
+
+
+# region/country
+country_filter = dbc.FormGroup(
     [
         dbc.Label('Region'),
-        create_dropdown('region_filter', region_list)
+        dcc.Dropdown(
+            id='country_filter',
+            multi=True
+        )
     ]
 )
 
 # income group
-income_list = ['Upper Middle Income', 'Low Income']
 income_filter = dbc.FormGroup(
     [
         dbc.Label('Income Group'),
-        create_dropdown('income_filter', income_list)
-    ]
-)
-
-# subagency
-subagency_list = ['Bureau for Latin America and Caribbean']
-subagency_filter = dbc.FormGroup(
-    [
-        dbc.Label('Subagency'),
-        create_dropdown('subagency_filter', subagency_list)
+        dcc.Dropdown(
+            id='income_filter',
+            multi=True
+        )
     ]
 )
 
 # category
-category_list = ['NGO', 'Enterprises', 'Universities & Research Institutions']
 category_filter = dbc.FormGroup(
     [
         dbc.Label('Category'),
-        create_dropdown('category_filter', category_list)
+        dcc.Dropdown(
+            id='category_filter',
+            multi=True
+        )
     ]
 )
 
 # sector
-sector_list = ['General Environmental Protection', 'Energy']
 sector_filter = dbc.FormGroup(
     [
         dbc.Label('Sector'),
-        create_dropdown('sector_filter', sector_list)
+        dcc.Dropdown(
+            id='sector_filter',
+            multi=True
+        )
     ]
 )
+
 
 # Filter Sidebar
 filters = html.Div(
@@ -163,7 +214,7 @@ filters = html.Div(
         html.P(
             "Filter search results"
         ),
-        region_filter,
+        country_filter,
         income_filter,
         category_filter,
         sector_filter,
@@ -176,7 +227,7 @@ filters = html.Div(
 tag_buttons = [
     dbc.Button(tag, id=tag, color='secondary', className='mr-1', size='large',
                block=True)\
-     for tag in _option_list
+     for tag in _option_list[:11]
 ]
 
 # Tag Sidebar
@@ -202,47 +253,11 @@ top_tags = html.Div(
     style=SIDEBAR_STYLE,
 )
 
-# report card
-
-report_card_1 = dbc.Card(
-    dbc.CardBody(
-        [
-            html.H4("Improved Coastal Watersheds and Livelihoods project", 
-                    className="card-title"),
-            html.H6("Improved Coastal Watershed and Livelihoods (ICWL) Project", 
-                    className="card-subtitle"),
-            html.P(
-                "Municipalities and local communities are supported to take on a stronger role in water, waste and natural resource management. Project objectives will be achieved through three expected results: 1.Natural ecosystems and biodiversity protected and restored through climate-smart approaches 2. Sustainability of rural livelihood systems improved through climate-smart approaches 3. Effectiveness and integration of source to sea watershed governance improved",
-                className="card-text",
-            ),
-            html.A("Report link", 
-                   href="https://oceanconference.un.org/commitments/?id=31422",
-                   target="_blank"),
-        ]
-    ), style = {"margin-top": "2rem"}
-)
-
-report_card_2 = dbc.Card(
-    dbc.CardBody(
-        [
-            html.H4("Final Report", 
-                    className="card-title"),
-            html.H6("Improved Coastal Watershed and Livelihoods (ICWL) Project", 
-                    className="card-subtitle"),
-            html.P(
-                "In total, 1463 people were trained within the ICWL project, including microfinance associations, governance structures, municipalities and national institutions, local NGOs, children, students, park rangers, among others. Training topics included organizational processes, participative planning, environmental, wildlife and protected areas.",
-                className="card-text",
-            ),
-            html.A("Report link", 
-                   href="https://pdf.usaid.gov/pdf_docs/PA00TRMV.pdf",
-                   target="_blank"),
-        ]
-    ), style = {"margin-top": "1rem"}
-)
-
 # results
-results = html.Div(
-    id='results'
+results = dcc.Loading(
+    html.Div(
+        id='results'
+    )
 )
 
 # define layout 
@@ -264,5 +279,6 @@ layout = html.Div([
              ], width=8),
             dbc.Col(top_tags, width=2)
         ]
-    ),    
+    ),
+    dcc.Store(id='results_store')  
 ])

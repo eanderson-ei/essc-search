@@ -46,6 +46,33 @@ To load csv, upload to github first and get raw link: https://stackoverflow.com/
 
 ## Tips
 
+#### Limitations on node properties
+
+Because tags and report filenames are being passed into an f string, single or double quotes can throw off the cypher query. As currently set up, tags and filenames must not include double quotes. An error will only occur when a double quote is encountered, so screen/block ahead of time.
+
+#### Dynamic callbacks and callbacks in loops
+
+If you are creating buttons or other features dynamically, and/or if you have a long or indeterminate list of buttons or other features as input, use `dash.callback_context` to create the callbacks:
+
+```python
+@app.callback(
+    Output('my_output', 'children'),
+    [Input(option, 'n_clicks') for option in button_list]
+)
+def dynamic_buttons(*button_clicks):
+    ctx = dash.callback_context
+    
+    if not ctx.triggered:
+        raise PreventUpdate
+
+    option = ctx.triggered[0]['prop_id'].split('.')[0]
+    return option
+```
+
+Inputs are passed as `*args` to the callback allowing for any number of inputs (in this case buttons). 
+
+## Dash Quickstart Guide
+
 ### Starting a Dash project
 
 How to start a Dash project
