@@ -2,6 +2,8 @@ import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
 from components import graph_database
+from callbacks import PAGE_LIMIT as PAGE_LIMIT
+import visdcc
 
 # import necessary functions from components/functions.py if needed
 
@@ -48,7 +50,7 @@ navbar = dbc.Navbar(
     className="mb-5"
 )
 
-# define layout items
+# SEARCH PAGE
 
 # instructions
 text = dcc.Markdown(
@@ -195,8 +197,31 @@ results = dcc.Loading(
     )
 )
 
+# pagination buttons
+back_button = dbc.Button(f"Show previous {str(PAGE_LIMIT)} results",
+                            id='back_button',
+                            size='sm',
+                            className='mr-2')
+
+forward_button = dbc.Button(f"Show next {str(PAGE_LIMIT)} results",
+                            id='forward_button',
+                            size='sm',
+                            className='mr-2')
+
+pagination_buttons = html.Div(
+    id='pagination_buttons',
+    children=[
+        back_button, forward_button
+    ],
+    hidden=True
+)
+
 # define layout 
 layout = html.Div([
+    dcc.Store(id='results_store'),
+    dcc.Store(id='filtered_results'),
+    dcc.Store(id='page_store'),
+    dcc.Store(id='tags_store'),
     navbar,
     dbc.Container(
         [
@@ -209,11 +234,20 @@ layout = html.Div([
             dbc.Col(filters, width=2),
             dbc.Col([
                 search_bar,
+                html.Div(results, id='results_box', style = {"maxHeight": "550px", "overflowY": "scroll"}),
                 html.Br(),
-                results
+                pagination_buttons
              ], width=8),
             dbc.Col(top_tags, width=2)
         ]
     ),
-    dcc.Store(id='results_store')  
+    visdcc.Run_js(id='scroll_top')
 ])
+
+
+# PROJECT PAGE
+
+project_layout = html.Div([
+    navbar,
+]
+)

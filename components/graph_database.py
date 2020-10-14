@@ -48,8 +48,24 @@ def get_report(tags):
         reports.append(result)
     reports = pd.concat(reports)
     reports['Label'] = reports['Label'].str[0]  # get labels out of list
+    reports.to_csv('data/reports.csv')
+    reports = reports.drop_duplicates()
     reports = reports.pivot(index=['Report_ID', 'Report_Title', 'Summary',
-                        'Link', 'Project'], columns='Label', values='Value')
+                                 'Link', 'Project'],
+                            columns='Label', values='Value')
     reports = reports.reset_index()
     
     return reports
+
+
+def get_tags_from_report(report):
+    """returns list of tags associated with a report"""
+    result = graph.run(
+        f"""
+        MATCH(r:Report)-[]-(t:Tag)
+        WHERE r.name = "{report}"
+        RETURN t.name
+        """
+    ).data()
+    result = [list(d.values()) for d in result]
+    return result
