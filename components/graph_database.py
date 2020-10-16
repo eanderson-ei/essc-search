@@ -69,3 +69,33 @@ def get_tags_from_report(report):
     ).data()
     result = [list(d.values()) for d in result]
     return result
+
+
+def get_related_projects(project):
+    """return list of related projects"""
+    tags = []
+    result = graph.run(
+        f"""
+        MATCH (p:Project {{`Project Name`: "{project}"}})-[s:SHARES_TAGS]->(p2:Project) 
+        RETURN p2 
+        ORDER BY s.count DESC 
+        LIMIT 7
+        """
+        ).data()
+    for record in result:
+        for _, each in record.items():
+            tags.append(each["Project Name"])
+        
+    return tags
+
+
+def get_project_property(project, property):
+    """returns property of a project"""
+    result = graph.run(
+        f"""
+        MATCH (p:Project {{`Project Name`: "{project}"}})
+        RETURN p["{property}"]
+        """
+    ).data()
+    result=str([list(d.values()) for d in result][0][0])
+    return result

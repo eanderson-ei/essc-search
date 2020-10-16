@@ -14,7 +14,7 @@ LOGO = app.get_asset_url('logo.png')  # update logo.png in assets/
 
 # nav item links
 nav_items = dbc.Container([
-    # dbc.NavItem(dbc.NavLink('App 1', href='/app1')),
+    dbc.NavItem(dbc.NavLink('Search', href='/')),
     # dbc.NavItem(dbc.NavLink('App 2', href='/app2'))
 ]
 )
@@ -246,8 +246,43 @@ layout = html.Div([
 
 
 # PROJECT PAGE
+# instructions
+graph_text = dcc.Markdown(
+    """
+    Learn more about this project and discover related projects. The figure below
+    displays this project's top 7 most related projects. The size of the
+    connection represents the strength of the relationship between projects.
+    Different color projects represent different clusters of related projects.
+    
+    **Click and drag to move individual nodes. Hover over nodes or relationships
+    for more info.**
+    """
+)
+
 
 project_layout = html.Div([
     navbar,
+    dbc.Container(
+        [
+            graph_text,
+            html.Br()
+        ],
+    ),
+    dbc.Container(
+        [
+            html.H2(id='project_title'),
+            html.P(id='project_description'),
+            dcc.Dropdown(id='input',
+                         placeholder='Select a related project'),
+            html.Div(id='viz', 
+                     style={
+                         'width': '100%',
+                         'height': '550px',
+                         'border': '1px solid lightgray',
+                         }
+                    ),
+            html.Br(),html.Br()
+        ]
+    )
 ]
 )

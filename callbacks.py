@@ -1,9 +1,10 @@
 import dash
-from dash.dependencies import Input, Output, State, ALL
+from dash.dependencies import Input, Output, State, ClientsideFunction
 from dash.exceptions import PreventUpdate
 import dash_bootstrap_components as dbc
 import dash_html_components as html
 import pandas as pd
+from urllib.parse import urlparse, parse_qs
 
 # import necessary functions from components/functions.py if needed
 from components import graph_database
@@ -57,98 +58,158 @@ filter_dict = {
     'sector_filter': 'Sector'
     }
 
+
 # country filter
-@app.callback(
-    [Output('country_filter', 'options'),
-     Output('country_filter', 'value')],
+@ app.callback(
+    Output('country_filter', 'value'),
     [Input('results_store', 'children')]
 )
-def update_country_filter(results):
-    if results:
-        filter_id = 'country_filter'
-        df = pd.DataFrame(results)
-        options = df[filter_dict.get(filter_id)].dropna().unique()
-        options = [
-            {'label': option, 'value': option} for option in options
-        ]
-        return options, None
-    else:
-        return [{'label': '', 'value': ''}], None
+def clear_country_value(results):
+    return None
 
-
-# income filter
 @app.callback(
-    [Output('income_filter', 'options'),
-    Output('income_filter', 'value')],
-    [Input('results_store', 'children')]
-)
-def update_income_filter(results):
-    if results:
-        filter_id = 'income_filter'
-        df = pd.DataFrame(results)
-        options = df[filter_dict.get(filter_id)].dropna().unique()
-        options = [
-            {'label': option, 'value': option} for option in options
-        ]
-        return options, None
-    else:
-        return [{'label': '', 'value': ''}], None
-    
-
-# category filter
-@app.callback(
-    [Output('category_filter', 'options'),
-    Output('category_filter', 'value')],
-    [Input('results_store', 'children')]
-)
-def update_category_filter(results):
-    if results:
-        filter_id = 'category_filter'
-        df = pd.DataFrame(results)
-        options = df[filter_dict.get(filter_id)].dropna().unique()
-        options = [
-            {'label': option, 'value': option} for option in options
-        ]
-        return options, None
-    else:
-        return [{'label': '', 'value': ''}], None
-    
-
-# sector filter
-@app.callback(
-    [Output('sector_filter', 'options'),
-     Output('sector_filter', 'value')],
-    [Input('results_store', 'children')]
-)
-def update_sector_filter(results):
-    if results:
-        filter_id = 'sector_filter'
-        df = pd.DataFrame(results)
-        options = df[filter_dict.get(filter_id)].dropna().unique()
-        options = [
-            {'label': option, 'value': option} for option in options
-        ]
-        return options, None
-    else:
-        return [{'label': '', 'value': ''}], None
-
-
-# Filter results
-@app.callback(
-    Output('filtered_results', 'children'),
+    Output('country_filter', 'options'),
     [Input('results_store', 'children'),
-     Input('country_filter', 'value'),
      Input('income_filter', 'value'),
      Input('category_filter', 'value'),
      Input('sector_filter', 'value')]
 )
-def filter_results(results_store,
-                   country_filter,
-                   income_filter,
-                   category_filter,
+def update_country_filter(results, income_filter, category_filter, sector_filter):
+    if results:
+        filter_id = 'country_filter'
+        df = filter_results(results, 
+                            None, 
+                            income_filter, 
+                            category_filter, 
+                            sector_filter)
+        if filter_dict.get(filter_id) in df.columns:  # protect against missing data
+            options = df[filter_dict.get(filter_id)].dropna().unique()
+            options = [
+                {'label': option, 'value': option} for option in options
+            ]
+            return options
+        else:
+            return [{'label': '', 'value': ''}]
+    else:
+        return [{'label': '', 'value': ''}]
+
+
+# income filter
+@ app.callback(
+    Output('income_filter', 'value'),
+    [Input('results_store', 'children')]
+)
+def clear_income_value(results):
+    return None
+
+
+@app.callback(
+    Output('income_filter', 'options'),
+    [Input('results_store', 'children'),
+     Input('country_filter', 'value'),
+     Input('category_filter', 'value'),
+     Input('sector_filter', 'value')]
+)
+def update_income_filter(results, country_filter, category_filter, sector_filter):
+    if results:
+        filter_id = 'income_filter'
+        df = filter_results(results, 
+                            country_filter, 
+                            None, 
+                            category_filter, 
+                            sector_filter)
+        if filter_dict.get(filter_id) in df.columns:  # protect against missing data
+            options = df[filter_dict.get(filter_id)].dropna().unique()
+            options = [
+                {'label': option, 'value': option} for option in options
+            ]
+            return options
+        else:
+            return [{'label': '', 'value': ''}]
+    else:
+        return [{'label': '', 'value': ''}]
+
+
+# category filter
+@ app.callback(
+    Output('category_filter', 'value'),
+    [Input('results_store', 'children')]
+)
+def clear_category_value(results):
+    return None
+
+
+@app.callback(
+    Output('category_filter', 'options'),
+    [Input('results_store', 'children'),
+     Input('country_filter', 'value'),
+     Input('income_filter', 'value'),
+     Input('sector_filter', 'value')]
+)
+def update_category_filter(results, country_filter, income_filter, sector_filter):
+    if results:
+        filter_id = 'category_filter'
+        df = filter_results(results, 
+                            country_filter, 
+                            income_filter, 
+                            None, 
+                            sector_filter)
+        if filter_dict.get(filter_id) in df.columns:  # protect against missing data
+            options = df[filter_dict.get(filter_id)].dropna().unique()
+            options = [
+                {'label': option, 'value': option} for option in options
+            ]
+            return options
+        else:
+            return [{'label': '', 'value': ''}]
+    else:
+        return [{'label': '', 'value': ''}]
+
+
+# sector filter
+@ app.callback(
+    Output('sector_filter', 'value'),
+    [Input('results_store', 'children')]
+)
+def clear_sector_value(results):
+    return None
+
+
+@app.callback(
+    Output('sector_filter', 'options'),
+    [Input('results_store', 'children'),
+     Input('country_filter', 'value'),
+     Input('income_filter', 'value'),
+     Input('category_filter', 'value')]
+)
+def update_sector_filter(results, country_filter, income_filter, category_filter):
+    if results:
+        filter_id = 'sector_filter'
+        df = filter_results(results, 
+                            country_filter, 
+                            income_filter, 
+                            category_filter, 
+                            None)
+        if filter_dict.get(filter_id) in df.columns:  # protect against missing data
+            options = df[filter_dict.get(filter_id)].dropna().unique()
+            options = [
+                {'label': option, 'value': option} for option in options
+            ]
+            return options
+        else:
+            return [{'label': '', 'value': ''}]
+    else:
+        return [{'label': '', 'value': ''}]
+
+
+def filter_results(results_store, 
+                   country_filter, 
+                   income_filter, 
+                   category_filter, 
                    sector_filter):
+    """returns filtered dataframe from dict, pass list of filter ids as kwargs"""
     if not results_store:
-        return {}
+        return pd.DataFrame()
     
     df = pd.DataFrame(results_store)
     
@@ -168,7 +229,9 @@ def filter_results(results_store,
         filt = df['Sector'].isin(sector_filter)
         df = df.loc[filt, :]
     
-    return df.to_dict('records')
+    
+    return df
+
 
 # Update page store
 @app.callback(
@@ -215,6 +278,7 @@ def paginate(back, forward, search_bar, f1, f2, f3, f4, page_store):
             page_store['start'] = start + PAGE_LIMIT
             page_store['end'] = end + PAGE_LIMIT
     
+    print(page_store)
     return page_store
 
 
@@ -222,7 +286,7 @@ def paginate(back, forward, search_bar, f1, f2, f3, f4, page_store):
 @app.callback(
     Output('tags_store', 'children'),
     [Input('page_store', 'children'),
-     Input('filtered_results', 'children'),
+     Input('results_store', 'children'),
      Input('country_filter', 'value'),
      Input('income_filter', 'value'),
      Input('category_filter', 'value'),
@@ -230,37 +294,24 @@ def paginate(back, forward, search_bar, f1, f2, f3, f4, page_store):
      [State('tags_store', 'children')]
 )
 def memoize_tags(page_store, 
-                 filtered_results, 
+                 results_store, 
                  country_filter, 
                  income_filter, 
                  category_filter, 
                  sector_filter,
                  tags_store):
-    ctx = dash.callback_context
-    trigger = ctx.triggered[0]['prop_id'].split('.')[0]
-    if not filtered_results:
+    # ctx = dash.callback_context
+    # trigger = ctx.triggered[0]['prop_id'].split('.')[0]
+    if not results_store:
         return {}
     if not tags_store:
         tags_store = {}
-        
-    df = pd.DataFrame(filtered_results)
     
-    # if country_filter:
-    #     filt = df['Country'].isin(country_filter)
-    #     df = df.loc[filt, :]
-    
-    # if income_filter:
-    #     filt = df['Income Group'].isin(income_filter)
-    #     df = df.loc[filt, :]
-    
-    # if category_filter:
-    #     filt = df['Category'].isin(category_filter)
-    #     df = df.loc[filt, :]
-    
-    # if sector_filter:
-    #     filt = df['Sector'].isin(sector_filter)
-    #     df = df.loc[filt, :]
-        
+    df = filter_results(results_store, 
+                        country_filter, 
+                        income_filter, 
+                        category_filter, 
+                        sector_filter)        
         
     # subset for pagination
     start = int(page_store.get('start', 0))
@@ -299,23 +350,33 @@ def deactivate_back_button(page_store):
 @app.callback(
     Output('forward_button', 'disabled'),
     [Input('page_store', 'children'),
-     Input('filtered_results', 'children')]
+     Input('results_store', 'children'),
+     Input('country_filter', 'value'),
+     Input('income_filter', 'value'),
+     Input('category_filter', 'value'),
+     Input('sector_filter', 'value')]
 )
-def deactivate_forward_button(page_store, filtered_results):
-    if not filtered_results:
-        return False  # keep active once unhidden
-    elif len(filtered_results) == 0:
-        return False
-    elif len(filtered_results) < int(page_store.get('end')): 
-        return True
+def deactivate_forward_button(page_store, results_store, country_filter, 
+                              income_filter, category_filter, sector_filter):
+    if results_store:
+        df = filter_results(results_store, 
+                            country_filter, 
+                            income_filter, 
+                            category_filter, 
+                            sector_filter)
+        if len(df) == 0:
+            return False
+        elif len(df) <= int(page_store.get('end')):
+            return True
+        else:
+            return False
     else:
         return False
-
 
 # Search Results
 @app.callback(
     Output('results', 'children'),
-    [Input('filtered_results', 'children'),
+    [Input('results_store', 'children'),
      Input('country_filter', 'value'),
      Input('income_filter', 'value'),
      Input('category_filter', 'value'),
@@ -323,7 +384,7 @@ def deactivate_forward_button(page_store, filtered_results):
      Input('page_store', 'children'),
      Input('tags_store', 'children')]
 )
-def update_search_results(results, 
+def update_search_results(results_store, 
                           country_filter, 
                           income_filter, 
                           category_filter, 
@@ -332,28 +393,14 @@ def update_search_results(results,
                           tags_store):
     """create search cards from tags selected"""    
     # get search results
-    if not results:
+    if not results_store:
         return "Please search for a tag above"
     
-    print(page_store)
-    
-    df = pd.DataFrame(results)   
-    
-    # if country_filter:
-    #     filt = df['Country'].isin(country_filter)
-    #     df = df.loc[filt, :]
-    
-    # if income_filter:
-    #     filt = df['Income Group'].isin(income_filter)
-    #     df = df.loc[filt, :]
-    
-    # if category_filter:
-    #     filt = df['Category'].isin(category_filter)
-    #     df = df.loc[filt, :]
-    
-    # if sector_filter:
-    #     filt = df['Sector'].isin(sector_filter)
-    #     df = df.loc[filt, :]
+    df = filter_results(results_store, 
+                        country_filter, 
+                        income_filter, 
+                        category_filter, 
+                        sector_filter)
 
     cards = []
     
@@ -378,13 +425,14 @@ def update_search_results(results,
                             className="card-title"),
                     html.H6(
                         html.A(result['Project'].upper(),
-                               href='/apps/project'),
+                            #    id='report_link',
+                               href=f"/apps/project?{result['Project']}"),
                         className="card-subtitle"),
                     html.P(
                         result['Summary'],
                         className="card-text",
                     ),
-                    html.A("Report link", 
+                    html.A("Report link",
                         href=result['Link'],
                         target="_blank"),
                     html.Br(),
@@ -412,4 +460,65 @@ def scroll_to_top(forward, back):
         textarea.scrollTop = 0
         """
         return js
-        
+
+# # Scroll up
+# app.clientside_callback(
+#     """
+#     var textarea = document.getElementById('results_box');
+#     textarea.scrollTop = 0
+#     """,
+#     Output('scroll_top', 'run'),
+#     [Input('forward_button', 'n_clicks'),
+#      Input('back_button', 'n_clicks')]
+# )
+    
+# Display knowledge graph  
+app.clientside_callback(
+    output=Output('viz', 'children'),
+    inputs=[Input('input', 'value')],
+    clientside_function = ClientsideFunction(
+        namespace='clientside',
+        function_name ='draw'
+    )
+)
+
+@app.callback(
+    Output('input', 'value'),
+    [Input('url', 'search')]
+)
+def pre_populate_graph(search):
+    parsed_url = urlparse(search)
+    parsed_search = parse_qs(parsed_url.query, keep_blank_values=True)
+    if parsed_search:
+        print(str(list(parsed_search.keys())[0]))
+        return str(list(parsed_search.keys())[0])
+    else:
+        raise PreventUpdate
+    
+@app.callback(
+    Output('input', 'options'),
+    [Input('input', 'value')]
+)
+def pop_related_projects(value):
+    print(value)
+    options = graph_database.get_related_projects(value)
+    options = [
+                {'label': option, 'value': option} for option in options
+            ] 
+    return options
+
+
+@app.callback(
+    Output('project_title', 'children'),
+    [Input('input', 'value')]
+)
+def show_project_title(value):
+    return value
+
+@app.callback(
+    Output('project_description', 'children'),
+    [Input('input', 'value')]
+)
+def get_project_description(value):
+    return graph_database.get_project_property(value, 'Description')
+

@@ -5,10 +5,12 @@ import json
 import os
 
 external_stylesheets = [dbc.themes.YETI]  # Also try LITERA, SPACELAB
+external_scripts = ["https://rawgit.com/neo4j-contrib/neovis.js/master/dist/neovis.js"]
 
 app = dash.Dash(__name__, 
-                external_stylesheets=external_stylesheets, 
-                show_undo_redo=False)
+                external_stylesheets=external_stylesheets,
+                external_scripts=external_scripts,
+                show_undo_redo=True)
 server = app.server
 app.config.suppress_callback_exceptions = True
 
