@@ -47,8 +47,9 @@ def get_report(tags):
                           'Link', 'Project', 'Label', 'Value']
         reports.append(result)
     reports = pd.concat(reports)
+    print(reports)
     reports['Label'] = reports['Label'].str[0]  # get labels out of list
-    reports.to_csv('data/reports.csv')
+    # reports.to_csv('data/outputs/reports.csv')
     reports = reports.drop_duplicates()
     reports = reports.pivot(index=['Report_ID', 'Report_Title', 'Summary',
                                  'Link', 'Project'],

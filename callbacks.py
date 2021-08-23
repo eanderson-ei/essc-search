@@ -408,6 +408,7 @@ def update_search_results(results_store,
     start = int(page_store.get('start', 0))
     end = int(page_store.get('end', PAGE_LIMIT))
     
+    print(df.iloc[start:end, :])
     for _, result in df.iloc[start:end, :].iterrows():
         
         # get tags and build badge list

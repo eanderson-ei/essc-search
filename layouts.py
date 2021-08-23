@@ -28,7 +28,7 @@ navbar = dbc.Navbar(
                 dbc.Row(
                     [
                         dbc.Col(html.Img(src=LOGO, height="30px")),
-                        dbc.Col(dbc.NavbarBrand("ESSC Search", className="ml-2")),
+                        dbc.Col(dbc.NavbarBrand("LAC/RSD Search", className="ml-2")),
                     ],
                     align="center",
                     no_gutters=True,
@@ -55,8 +55,8 @@ navbar = dbc.Navbar(
 # instructions
 text = dcc.Markdown(
     """
-    This application supports keyword-driven search of the LAC ESSC Projects
-    Database. The Database provides access to knowledge from LAC ESSC projects
+    This application supports keyword-driven search of the LAC/RSD Environment
+    Team Database. The Database provides access to knowledge from LAC ESSC projects
     captured in reports and write ups.
     
     **Use the search bar to search projects and reports by tag. Filter results 
